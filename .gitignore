@@ -5,6 +5,11 @@ backend/database.sqlite-shm
 backend/database.sqlite-wal
 backend/.env
 
+# SQLite files anywhere in project
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
 # Mobile
 mobile/node_modules/
 mobile/.expo/
