@@ -259,6 +259,13 @@ export default function ForkliftHomeScreen({ navigation }) {
           <Text style={styles.adminButtonText}>Admin Settings</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+            style={[styles.adminButton, { marginTop: 8 }]}
+            onPress={() => navigation.navigate('SupervisorDashboard')}
+        >
+            <Text style={styles.adminButtonText}>Supervisor Dashboard</Text>
+        </TouchableOpacity>
+
       </ScrollView>
 
       {/* Leave Reason Modal */}

@@ -1,3 +1,4 @@
+import SupervisorDashboardScreen from '../screens/SupervisorDashboard';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -29,18 +30,21 @@ export default function Navigation() {
           <>
             <Stack.Screen name="ModeSelect" component={ModeSelectScreen} />
             <Stack.Screen name="AdminConfig" component={AdminConfigScreen} />
+            <Stack.Screen name="SupervisorDashboard" component={SupervisorDashboardScreen} />
           </>
         ) : state.mode === 'cell' ? (
           <>
             <Stack.Screen name="CellHome" component={CellHomeScreen} />
             <Stack.Screen name="CellWaiting" component={CellWaitingScreen} />
             <Stack.Screen name="AdminConfig" component={AdminConfigScreen} />
+            <Stack.Screen name="SupervisorDashboard" component={SupervisorDashboardScreen} />
           </>
         ) : (
           <>
             <Stack.Screen name="ForkliftHome" component={ForkliftHomeScreen} />
             <Stack.Screen name="ForkliftAlert" component={ForkliftAlertScreen} />
             <Stack.Screen name="AdminConfig" component={AdminConfigScreen} />
+            <Stack.Screen name="SupervisorDashboard" component={SupervisorDashboardScreen} />
           </>
         )}
       </Stack.Navigator>
