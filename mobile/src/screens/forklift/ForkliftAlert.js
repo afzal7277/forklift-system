@@ -1,3 +1,5 @@
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { Audio } from 'expo-av';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -36,10 +38,25 @@ export default function ForkliftAlertScreen({ navigation, route }) {
   const timerRef = useRef(null);
 
   useEffect(() => {
+    activateKeepAwakeAsync();
+    playAlertSound();
     startPulse();
     setupSocketListeners();
 
+    const playAlertSound = async () => {
+        try {
+            const { sound } = await Audio.Sound.createAsync(
+            { uri: 'https://www.soundjay.com/buttons/sounds/beep-01a.mp3' },
+            { shouldPlay: true, isLooping: true }
+            );
+            return sound;
+        } catch (error) {
+            console.log('Sound error: ' + error.message);
+        }
+    };
+
     return () => {
+      deactivateKeepAwake();
       stopTimers();
       const socket = getSocket();
       if (socket) {
