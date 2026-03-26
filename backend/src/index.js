@@ -30,6 +30,7 @@ app.use('/api/forklifts', require('./routes/forklifts'));
 app.use('/api/cells', require('./routes/cells'));
 app.use('/api/requests', require('./routes/requests'));
 app.use('/api/config', require('./routes/config'));
+app.use('/api/devices', require('./routes/devices'));
 
 // Attach io to app so routes can access it
 app.set('io', io);

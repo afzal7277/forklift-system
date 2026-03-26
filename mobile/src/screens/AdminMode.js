@@ -81,41 +81,36 @@ export default function AdminModeScreen({ navigation }) {
     return Math.floor(diff / 3600) + 'h ago';
   };
 
-  const menuItems = [
+const menuItems = [
     {
       label: 'Forklifts',
       description: 'Add or remove forklifts',
       color: COLORS.success,
-      screen: 'AdminConfig',
-      params: { tab: 'forklifts' },
+      screen: 'ForkliftsScreen',
     },
     {
       label: 'Cells',
       description: 'Add or remove workstation cells',
       color: COLORS.primary,
-      screen: 'AdminConfig',
-      params: { tab: 'cells' },
+      screen: 'CellsScreen',
     },
     {
       label: 'System Config',
       description: 'Timeouts and leave comments',
       color: COLORS.warning,
-      screen: 'AdminConfig',
-      params: { tab: 'config' },
+      screen: 'SystemConfigScreen',
     },
     {
       label: 'Change PIN',
       description: 'Update admin PIN',
       color: COLORS.darkGray,
-      screen: 'AdminConfig',
-      params: { tab: 'pin' },
+      screen: 'PinScreen',
     },
     {
       label: 'Supervisor Dashboard',
       description: 'Live status and KPI monitoring',
       color: COLORS.danger,
       screen: 'SupervisorDashboard',
-      params: {},
     },
   ];
 
@@ -140,8 +135,7 @@ export default function AdminModeScreen({ navigation }) {
           <TouchableOpacity
             key={item.label}
             style={styles.menuItem}
-            onPress={() => navigation.navigate(item.screen, item.params)}
-          >
+                onPress={() => navigation.navigate(item.screen)}          >
             <View
               style={[styles.menuDot, { backgroundColor: item.color }]}
             />

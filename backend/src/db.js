@@ -85,6 +85,20 @@ db.exec(`
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
   );
+
+  -- Device registry
+  CREATE TABLE IF NOT EXISTS devices (
+    id TEXT PRIMARY KEY,
+    device_id TEXT NOT NULL UNIQUE,
+    mode TEXT,
+    cell_id TEXT,
+    forklift_id TEXT,
+    last_seen DATETIME,
+    registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cell_id) REFERENCES cells(id),
+    FOREIGN KEY (forklift_id) REFERENCES forklifts(id)
+  );
+
 `);
 
 // Seed default data if empty

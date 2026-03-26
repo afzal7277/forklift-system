@@ -5,7 +5,10 @@ import { useApp } from '../context/AppContext';
 
 import ModeSelectScreen from '../screens/ModeSelect';
 import AdminModeScreen from '../screens/AdminMode';
-import AdminConfigScreen from '../screens/AdminConfig';
+import ForkliftsScreen from '../screens/admin/ForkliftsScreen';
+import CellsScreen from '../screens/admin/CellsScreen';
+import SystemConfigScreen from '../screens/admin/SystemConfigScreen';
+import PinScreen from '../screens/admin/PinScreen';
 import SupervisorDashboardScreen from '../screens/SupervisorDashboard';
 
 import CellHomeScreen from '../screens/cell/CellHome';
@@ -31,7 +34,10 @@ export default function Navigation() {
           <>
             <Stack.Screen name="ModeSelect" component={ModeSelectScreen} />
             <Stack.Screen name="AdminMode" component={AdminModeScreen} />
-            <Stack.Screen name="AdminConfig" component={AdminConfigScreen} />
+            <Stack.Screen name="ForkliftsScreen" component={ForkliftsScreen} />
+            <Stack.Screen name="CellsScreen" component={CellsScreen} />
+            <Stack.Screen name="SystemConfigScreen" component={SystemConfigScreen} />
+            <Stack.Screen name="PinScreen" component={PinScreen} />
             <Stack.Screen name="SupervisorDashboard" component={SupervisorDashboardScreen} />
           </>
         ) : state.mode === 'cell' ? (

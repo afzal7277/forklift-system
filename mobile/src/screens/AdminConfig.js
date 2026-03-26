@@ -29,9 +29,9 @@ import {
   changePin,
 } from '../services/api';
 
-export default function AdminConfigScreen({ navigation }) {
+export default function AdminConfigScreen({ navigation, route }) {
   const { dispatch } = useApp();
-  const [activeTab, setActiveTab] = useState('forklifts');
+  const [activeTab, setActiveTab] = useState(route.params?.tab || 'forklifts');
   const [loading, setLoading] = useState(false);
 
   // Forklifts
