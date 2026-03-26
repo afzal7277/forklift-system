@@ -57,3 +57,12 @@ export const addLeaveComment = (comment) =>
   request('POST', '/api/config/leave-comments', { comment });
 export const deleteLeaveComment = (id) =>
   request('DELETE', `/api/config/leave-comments/${id}`);
+
+// Devices
+export const registerDevice = (data) =>
+  request('POST', '/api/devices/register', data);
+export const getDevices = () => request('GET', '/api/devices');
+export const deleteDevice = (device_id) =>
+  request('DELETE', `/api/devices/${device_id}`);
+export const pingDevice = (device_id) =>
+  request('PUT', `/api/devices/${device_id}/ping`, {});

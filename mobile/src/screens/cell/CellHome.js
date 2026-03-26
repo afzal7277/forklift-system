@@ -279,21 +279,6 @@ export default function CellHomeScreen({ navigation }) {
           </View>
         ) : null}
 
-        {/* Admin Config Button */}
-        <TouchableOpacity
-          style={styles.adminButton}
-          onPress={() => navigation.navigate('AdminConfig')}
-        >
-          <Text style={styles.adminButtonText}>Admin Settings</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-            style={[styles.adminButton, { marginTop: 8 }]}
-            onPress={() => navigation.navigate('SupervisorDashboard')}
-        >
-            <Text style={styles.adminButtonText}>Supervisor Dashboard</Text>
-        </TouchableOpacity>
-
       </ScrollView>
     </SafeAreaView>
   );
