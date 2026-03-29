@@ -16,10 +16,14 @@ mobile/.expo/
 mobile/android/
 mobile/ios/
 mobile/.env
-mobile/eas.json
+
 
 # General
 .DS_Store
 *.log
 node_modules
+
+# EAS
+eas.json
+mobile/eas.json
 
