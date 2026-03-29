@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client';
 import { CONFIG } from '../constants/config';
+import { processQueue, addToQueue } from './offlineQueue';
 
 let socket = null;
 let heartbeatInterval = null;
@@ -23,6 +24,7 @@ export function connectSocket(onConnect, onDisconnect) {
   socket.on('connect', () => {
     console.log('Socket connected: ' + socket.id);
     startHeartbeat();
+    processQueue(socket);
     if (onConnect) onConnect();
   });
 
@@ -66,8 +68,14 @@ export function registerAsSupervisor() {
 }
 
 export function sendRequest(cell_id, forklift_type_id) {
-  if (socket) {
+  if (socket && socket.connected) {
     socket.emit('send_request', { cell_id, forklift_type_id });
+  } else {
+    addToQueue({
+      type: 'send_request',
+      data: { cell_id, forklift_type_id },
+    });
+    console.log('Request queued for later delivery');
   }
 }
 
@@ -84,8 +92,14 @@ export function declineRequest(request_id, forklift_id, reason = null) {
 }
 
 export function completeRequest(request_id, forklift_id) {
-  if (socket) {
+  if (socket && socket.connected) {
     socket.emit('complete_request', { request_id, forklift_id });
+  } else {
+    addToQueue({
+      type: 'complete_request',
+      data: { request_id, forklift_id },
+    });
+    console.log('Complete request queued for later delivery');
   }
 }
 
