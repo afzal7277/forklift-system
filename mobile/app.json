@@ -16,7 +16,8 @@
       "bundleIdentifier": "com.konoozi.forkliftcallsystem"
     },
     "android": {
-      "package": "com.konoozi.forkliftcallsystem",
+      "package": "com.zafff.forkliftsystem",
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -26,11 +27,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "84cfa56b-f2ee-41de-84af-a90edca46be5"
-      }
     }
   }
 }
