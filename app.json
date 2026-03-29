@@ -4,6 +4,9 @@
       "eas": {
         "projectId": "53622713-2704-41bc-a78f-6497aaa26432"
       }
+    },
+    "android": {
+      "package": "com.zafff.forkliftsystem"
     }
   }
 }
