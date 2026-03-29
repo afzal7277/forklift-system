@@ -3,6 +3,9 @@ import { CONFIG } from '../constants/config';
 const BASE_URL = CONFIG.SERVER_URL;
 
 async function request(method, endpoint, body = null) {
+  const url = `${BASE_URL}${endpoint}`;
+  console.log('API request: ' + method + ' ' + url);
+  
   const options = {
     method,
     headers: {
@@ -15,12 +18,13 @@ async function request(method, endpoint, body = null) {
   }
 
   try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, options);
+    const response = await fetch(url, options);
     const data = await response.json();
+    console.log('API response: ' + JSON.stringify(data).substring(0, 100));
     return data;
   } catch (error) {
-    console.log('API error: ' + error.message);
-    return { success: false, message: 'Network error - check connection' };
+    console.log('API error: ' + error.message + ' URL: ' + url);
+    return { success: false, message: 'Network error - ' + error.message };
   }
 }
 

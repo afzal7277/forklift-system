@@ -4,6 +4,8 @@ const db = require('../db');
 
 // Verify admin PIN
 router.post('/verify-pin', (req, res) => {
+  console.log('PIN verify attempt received: ' + JSON.stringify(req.body));
+
   const { pin } = req.body;
 
   if (!pin) {

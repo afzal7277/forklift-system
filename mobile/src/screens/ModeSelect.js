@@ -14,8 +14,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApp } from '../context/AppContext';
 import { COLORS, TABLET_MODES } from '../constants/config';
-import { getCells, getForklifts, registerDevice } from '../services/api';
 import { getDeviceId } from '../services/device';
+import { getCells, getForklifts, registerDevice, verifyPin } from '../services/api';
+
 
 export default function ModeSelectScreen({ navigation }) {
   const { dispatch } = useApp();
@@ -75,18 +76,14 @@ export default function ModeSelectScreen({ navigation }) {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        require('../constants/config').CONFIG.SERVER_URL + '/api/auth/verify-pin',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pin }),
-        }
-      );
-      const data = await response.json();
+      const data = await verifyPin(pin);
 
       if (!data.success) {
-        setPinError('Invalid PIN');
+        if (data.message && data.message.includes('Network')) {
+          setPinError('Cannot connect to server: ' + data.message);
+        } else {
+          setPinError('Invalid PIN');
+        }
         setLoading(false);
         return;
       }
@@ -95,7 +92,7 @@ export default function ModeSelectScreen({ navigation }) {
       setLoading(false);
       navigation.navigate('AdminMode');
     } catch (error) {
-      setPinError('Cannot connect to server');
+      setPinError('Exception: ' + error.message);
       setLoading(false);
     }
   };
