@@ -1,9 +1,8 @@
-const SERVER_IP = process.env.EXPO_PUBLIC_SERVER_IP;
-const SERVER_PORT = process.env.EXPO_PUBLIC_SERVER_PORT || '3000';
+const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL || 'https://forklift-backend.onrender.com';
 
 export const CONFIG = {
-  SERVER_URL: `http://${SERVER_IP}:${SERVER_PORT}`,
-  SOCKET_URL: `http://${SERVER_IP}:${SERVER_PORT}`,
+  SERVER_URL,
+  SOCKET_URL: SERVER_URL,
   ADMIN_PIN_LENGTH: 4,
   HEARTBEAT_INTERVAL: 10000,
   RECONNECT_ATTEMPTS: 5,
