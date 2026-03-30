@@ -1,5 +1,3 @@
-import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { Audio } from 'expo-av';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -38,8 +36,6 @@ export default function ForkliftAlertScreen({ navigation, route }) {
   const timerRef = useRef(null);
 
   useEffect(() => {
-    activateKeepAwakeAsync();
-    playAlertSound();
     startPulse();
     setupSocketListeners();
 
@@ -56,7 +52,6 @@ export default function ForkliftAlertScreen({ navigation, route }) {
     };
 
     return () => {
-      deactivateKeepAwake();
       stopTimers();
       const socket = getSocket();
       if (socket) {
