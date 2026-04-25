@@ -1,6 +1,6 @@
 {
   "dependencies": {
     "expo": "54.0.33",
-    "react-native-get-random-values": "^2.0.0"
+    "react-native-get-random-values": "^1.11.0"
   }
 }
