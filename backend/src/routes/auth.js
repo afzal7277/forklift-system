@@ -1,50 +1,36 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
+const { pool } = require('../db');
 
-// Verify admin PIN
-router.post('/verify-pin', (req, res) => {
+router.post('/verify-pin', async (req, res) => {
+  try {
+    const { pin } = req.body;
+    if (!pin) return res.status(400).json({ success: false, message: 'PIN is required' });
 
-  const { pin } = req.body;
+    const { rows } = await pool.query("SELECT value FROM config WHERE key = 'admin_pin'");
+    if (!rows[0]) return res.status(500).json({ success: false, message: 'PIN not configured' });
+    if (pin !== rows[0].value) return res.status(401).json({ success: false, message: 'Invalid PIN' });
 
-  if (!pin) {
-    return res.status(400).json({ success: false, message: 'PIN is required' });
+    return res.json({ success: true, message: 'PIN verified' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
   }
-
-  const config = db.prepare('SELECT value FROM config WHERE key = ?').get('admin_pin');
-
-  if (!config) {
-    return res.status(500).json({ success: false, message: 'PIN not configured' });
-  }
-
-  if (pin !== config.value) {
-    return res.status(401).json({ success: false, message: 'Invalid PIN' });
-  }
-
-  return res.json({ success: true, message: 'PIN verified' });
 });
 
-// Change admin PIN
-router.post('/change-pin', (req, res) => {
-  const { current_pin, new_pin } = req.body;
+router.post('/change-pin', async (req, res) => {
+  try {
+    const { current_pin, new_pin } = req.body;
+    if (!current_pin || !new_pin) return res.status(400).json({ success: false, message: 'Both PINs are required' });
 
-  if (!current_pin || !new_pin) {
-    return res.status(400).json({ success: false, message: 'Both PINs are required' });
+    const { rows } = await pool.query("SELECT value FROM config WHERE key = 'admin_pin'");
+    if (current_pin !== rows[0].value) return res.status(401).json({ success: false, message: 'Current PIN is incorrect' });
+    if (new_pin.length < 4) return res.status(400).json({ success: false, message: 'PIN must be at least 4 digits' });
+
+    await pool.query("UPDATE config SET value = $1 WHERE key = 'admin_pin'", [new_pin]);
+    return res.json({ success: true, message: 'PIN changed successfully' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
   }
-
-  const config = db.prepare('SELECT value FROM config WHERE key = ?').get('admin_pin');
-
-  if (current_pin !== config.value) {
-    return res.status(401).json({ success: false, message: 'Current PIN is incorrect' });
-  }
-
-  if (new_pin.length < 4) {
-    return res.status(400).json({ success: false, message: 'PIN must be at least 4 digits' });
-  }
-
-  db.prepare('UPDATE config SET value = ? WHERE key = ?').run(new_pin, 'admin_pin');
-
-  return res.json({ success: true, message: 'PIN changed successfully' });
 });
 
 module.exports = router;

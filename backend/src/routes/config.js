@@ -1,67 +1,72 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
+const { pool } = require('../db');
 
 // Get all config
-router.get('/', (req, res) => {
-  const configs = db.prepare('SELECT * FROM config').all();
-  const result = {};
-  configs.forEach(c => {
-    if (c.key !== 'admin_pin') {
-      result[c.key] = c.value;
-    }
-  });
-  return res.json({ success: true, data: result });
+router.get('/', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM config');
+    const result = {};
+    rows.forEach(c => { if (c.key !== 'admin_pin') result[c.key] = c.value; });
+    return res.json({ success: true, data: result });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 });
 
-// Update a config value
-router.put('/:key', (req, res) => {
-  const { value } = req.body;
-  const { key } = req.params;
+// Update config value
+router.put('/:key', async (req, res) => {
+  try {
+    const { value } = req.body;
+    const { key } = req.params;
 
-  if (key === 'admin_pin') {
-    return res.status(403).json({ success: false, message: 'Use /auth/change-pin to update PIN' });
+    if (key === 'admin_pin') return res.status(403).json({ success: false, message: 'Use /auth/change-pin to update PIN' });
+    if (!value) return res.status(400).json({ success: false, message: 'Value is required' });
+
+    const { rows } = await pool.query('SELECT * FROM config WHERE key = $1', [key]);
+    if (!rows[0]) return res.status(404).json({ success: false, message: 'Config key not found' });
+
+    await pool.query('UPDATE config SET value = $1 WHERE key = $2', [value, key]);
+    return res.json({ success: true, message: 'Config updated' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
   }
-
-  if (!value) {
-    return res.status(400).json({ success: false, message: 'Value is required' });
-  }
-
-  const existing = db.prepare('SELECT * FROM config WHERE key = ?').get(key);
-  if (!existing) {
-    return res.status(404).json({ success: false, message: 'Config key not found' });
-  }
-
-  db.prepare('UPDATE config SET value = ? WHERE key = ?').run(value, key);
-  return res.json({ success: true, message: 'Config updated' });
 });
 
 // Get leave comments
-router.get('/leave-comments', (req, res) => {
-  const comments = db.prepare('SELECT * FROM leave_comments').all();
-  return res.json({ success: true, data: comments });
+router.get('/leave-comments', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM leave_comments ORDER BY id ASC');
+    return res.json({ success: true, data: rows });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 // Add leave comment
-router.post('/leave-comments', (req, res) => {
-  const { comment } = req.body;
-  if (!comment) {
-    return res.status(400).json({ success: false, message: 'Comment is required' });
-  }
+router.post('/leave-comments', async (req, res) => {
+  try {
+    const { comment } = req.body;
+    if (!comment) return res.status(400).json({ success: false, message: 'Comment is required' });
 
-  const existing = db.prepare('SELECT * FROM leave_comments WHERE comment = ?').get(comment);
-  if (existing) {
-    return res.status(400).json({ success: false, message: 'Comment already exists' });
-  }
+    const { rows: existing } = await pool.query('SELECT * FROM leave_comments WHERE comment = $1', [comment]);
+    if (existing[0]) return res.status(400).json({ success: false, message: 'Comment already exists' });
 
-  db.prepare('INSERT INTO leave_comments (comment) VALUES (?)').run(comment);
-  return res.json({ success: true, message: 'Comment added' });
+    await pool.query('INSERT INTO leave_comments (comment) VALUES ($1)', [comment]);
+    return res.json({ success: true, message: 'Comment added' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 // Delete leave comment
-router.delete('/leave-comments/:id', (req, res) => {
-  db.prepare('DELETE FROM leave_comments WHERE id = ?').run(req.params.id);
-  return res.json({ success: true, message: 'Comment deleted' });
+router.delete('/leave-comments/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM leave_comments WHERE id = $1', [req.params.id]);
+    return res.json({ success: true, message: 'Comment deleted' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 module.exports = router;

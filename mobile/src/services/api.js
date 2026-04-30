@@ -4,26 +4,17 @@ const BASE_URL = CONFIG.SERVER_URL;
 
 async function request(method, endpoint, body = null) {
   const url = `${BASE_URL}${endpoint}`;
-  console.log('API request: ' + method + ' ' + url);
-  
   const options = {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
   };
-
-  if (body) {
-    options.body = JSON.stringify(body);
-  }
+  if (body) options.body = JSON.stringify(body);
 
   try {
     const response = await fetch(url, options);
     const data = await response.json();
-    console.log('API response: ' + JSON.stringify(data).substring(0, 100));
     return data;
   } catch (error) {
-    console.log('API error: ' + error.message + ' URL: ' + url);
     return { success: false, message: 'Network error - ' + error.message };
   }
 }
@@ -38,6 +29,10 @@ export const getForklifts = () => request('GET', '/api/forklifts');
 export const getForkliftTypes = () => request('GET', '/api/forklifts/types');
 export const createForklift = (data) => request('POST', '/api/forklifts', data);
 export const deleteForklift = (id) => request('DELETE', `/api/forklifts/${id}`);
+
+// Forklift types (dynamic - fix #3)
+export const createForkliftType = (name) => request('POST', '/api/forklifts/types', { name });
+export const deleteForkliftType = (id) => request('DELETE', `/api/forklifts/types/${id}`);
 
 // Cells
 export const getCells = () => request('GET', '/api/cells');
@@ -54,19 +49,13 @@ export const getKpiSummary = () => request('GET', '/api/requests/kpi/summary');
 
 // Config
 export const getConfig = () => request('GET', '/api/config');
-export const updateConfig = (key, value) =>
-  request('PUT', `/api/config/${key}`, { value });
+export const updateConfig = (key, value) => request('PUT', `/api/config/${key}`, { value });
 export const getLeaveComments = () => request('GET', '/api/config/leave-comments');
-export const addLeaveComment = (comment) =>
-  request('POST', '/api/config/leave-comments', { comment });
-export const deleteLeaveComment = (id) =>
-  request('DELETE', `/api/config/leave-comments/${id}`);
+export const addLeaveComment = (comment) => request('POST', '/api/config/leave-comments', { comment });
+export const deleteLeaveComment = (id) => request('DELETE', `/api/config/leave-comments/${id}`);
 
 // Devices
-export const registerDevice = (data) =>
-  request('POST', '/api/devices/register', data);
+export const registerDevice = (data) => request('POST', '/api/devices/register', data);
 export const getDevices = () => request('GET', '/api/devices');
-export const deleteDevice = (device_id) =>
-  request('DELETE', `/api/devices/${device_id}`);
-export const pingDevice = (device_id) =>
-  request('PUT', `/api/devices/${device_id}/ping`, {});
+export const deleteDevice = (device_id) => request('DELETE', `/api/devices/${device_id}`);
+export const pingDevice = (device_id) => request('PUT', `/api/devices/${device_id}/ping`, {});

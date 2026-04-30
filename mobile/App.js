@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useKeepAwake } from 'expo-keep-awake';
 import { AppProvider, useApp } from './src/context/AppContext';
 import Navigation from './src/navigation';
 import { View, ActivityIndicator } from 'react-native';
@@ -10,6 +11,9 @@ import { COLORS } from './src/constants/config';
 function AppContent() {
   const { dispatch } = useApp();
   const [restoring, setRestoring] = useState(true);
+
+  // Keep screen always on (fix #5)
+  useKeepAwake();
 
   useEffect(() => {
     restoreSession();
