@@ -90,6 +90,13 @@ router.post('/', async (req, res) => {
     const { rows: type } = await pool.query('SELECT * FROM forklift_types WHERE id = $1', [type_id]);
     if (!type[0]) return res.status(400).json({ success: false, message: 'Invalid forklift type' });
 
+    // Block duplicate name + type combination
+    const { rows: duplicate } = await pool.query(
+      'SELECT * FROM forklifts WHERE LOWER(name) = LOWER($1) AND type_id = $2',
+      [name, type_id]
+    );
+    if (duplicate[0]) return res.status(400).json({ success: false, message: 'A forklift with this name and type already exists' });
+
     const id = generateId();
     await pool.query(
       "INSERT INTO forklifts (id, name, type_id, status) VALUES ($1, $2, $3, 'available')",
