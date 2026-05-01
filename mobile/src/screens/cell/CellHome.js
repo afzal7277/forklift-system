@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApp } from '../../context/AppContext';
@@ -31,6 +29,7 @@ export default function CellHomeScreen({ navigation }) {
         socket.off('request_completed');
         socket.off('request_timeout_completed');
         socket.off('no_forklifts_available');
+        socket.off('request_cancelled');
         socket.off('error');
       }
     };
@@ -56,15 +55,12 @@ export default function CellHomeScreen({ navigation }) {
       interval = setInterval(() => {
         setElapsed(Math.floor((Date.now() - new Date(currentRequest.created_at)) / 1000));
       }, 1000);
-    } else {
-      setElapsed(0);
-    }
+    } else { setElapsed(0); }
     return () => { if (interval) clearInterval(interval); };
   }, [currentRequest]);
 
   const initSocket = useCallback(async () => {
     const deviceId = await getDeviceId();
-
     connectSocket(
       () => { dispatch({ type: 'SET_CONNECTED', payload: true }); registerAsCell(cellData.id); },
       () => { dispatch({ type: 'SET_CONNECTED', payload: false }); }
@@ -72,12 +68,8 @@ export default function CellHomeScreen({ navigation }) {
 
     const socket = getSocket();
 
-    // Force reset listener - fires when admin deletes this cell or device (fix #1)
     socket.off('force_reset_' + deviceId);
-    socket.on('force_reset_' + deviceId, () => {
-      console.log('Force reset received');
-      handleForceReset();
-    });
+    socket.on('force_reset_' + deviceId, () => handleForceReset());
 
     socket.on('registered', () => console.log('Cell registered'));
     socket.on('request_sent', (request) => dispatch({ type: 'SET_CURRENT_REQUEST', payload: request }));
@@ -96,6 +88,16 @@ export default function CellHomeScreen({ navigation }) {
     socket.on('no_forklifts_available', (data) => {
       dispatch({ type: 'CLEAR_REQUEST' });
       Alert.alert('No Forklifts Available', data.message || 'No forklifts available.');
+    });
+    // Handle all cancellation reasons
+    socket.on('request_cancelled', (data) => {
+      dispatch({ type: 'CLEAR_REQUEST' });
+      const reason = data?.reason;
+      let message = 'Your request was cancelled.';
+      if (reason === 'no_forklifts_available') message = 'No forklifts of this type are currently available. Please try again.';
+      else if (reason === 'no_forklifts_responded') message = 'No forklifts responded in time. Please try again.';
+      else if (reason === 'no_forklifts_available_offline') message = 'Forklift went offline. No forklifts available. Please try again.';
+      Alert.alert('Request Cancelled', message);
     });
     socket.on('error', (data) => Alert.alert('Error', data.message));
   }, [cellData, handleForceReset]);
@@ -118,7 +120,7 @@ export default function CellHomeScreen({ navigation }) {
     ]);
   };
 
-  const formatElapsed = (s) => (Math.floor(s/60) > 0 ? Math.floor(s/60) + 'm ' : '') + (s%60) + 's';
+  const formatElapsed = (s) => (Math.floor(s / 60) > 0 ? Math.floor(s / 60) + 'm ' : '') + (s % 60) + 's';
   const getStatusColor = () => !isConnected ? COLORS.danger : currentRequest?.status === 'accepted' ? COLORS.success : currentRequest?.status === 'pending' ? COLORS.warning : COLORS.success;
   const getStatusText = () => !isConnected ? 'Disconnected' : currentRequest?.status === 'accepted' ? 'Forklift On The Way' : currentRequest?.status === 'pending' ? 'Waiting for Forklift...' : 'Ready';
 

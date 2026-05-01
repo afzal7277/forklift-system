@@ -10,6 +10,7 @@ import CellsScreen from '../screens/admin/CellsScreen';
 import SystemConfigScreen from '../screens/admin/SystemConfigScreen';
 import PinScreen from '../screens/admin/PinScreen';
 import SupervisorDashboardScreen from '../screens/SupervisorDashboard';
+import RequestHistoryScreen from '../screens/admin/RequestHistoryScreen';
 
 import CellHomeScreen from '../screens/cell/CellHome';
 import CellWaitingScreen from '../screens/cell/CellWaiting';
@@ -24,12 +25,7 @@ export default function Navigation() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          gestureEnabled: false,
-        }}
-      >
+      <Stack.Navigator screenOptions={{ headerShown: false, gestureEnabled: false }}>
         {!state.mode ? (
           <>
             <Stack.Screen name="ModeSelect" component={ModeSelectScreen} />
@@ -39,6 +35,7 @@ export default function Navigation() {
             <Stack.Screen name="SystemConfigScreen" component={SystemConfigScreen} />
             <Stack.Screen name="PinScreen" component={PinScreen} />
             <Stack.Screen name="SupervisorDashboard" component={SupervisorDashboardScreen} />
+            <Stack.Screen name="RequestHistoryScreen" component={RequestHistoryScreen} />
           </>
         ) : state.mode === 'cell' ? (
           <>

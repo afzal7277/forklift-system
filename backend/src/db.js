@@ -35,6 +35,7 @@ async function initDb() {
       forklift_id TEXT REFERENCES forklifts(id),
       status TEXT DEFAULT 'pending',
       decline_reason TEXT,
+      cancel_reason TEXT,
       created_at TIMESTAMPTZ DEFAULT NOW(),
       accepted_at TIMESTAMPTZ,
       completed_at TIMESTAMPTZ,
@@ -59,6 +60,9 @@ async function initDb() {
       id SERIAL PRIMARY KEY,
       request_id TEXT NOT NULL REFERENCES requests(id),
       event TEXT NOT NULL,
+      forklift_id TEXT,
+      reason TEXT,
+      forklift_status_at_time TEXT,
       value_seconds INTEGER,
       recorded_at TIMESTAMPTZ DEFAULT NOW()
     );
@@ -79,7 +83,17 @@ async function initDb() {
     );
   `);
 
-  // Seed forklift types
+  // Add new columns to existing tables if upgrading
+  const alterQueries = [
+    'ALTER TABLE requests ADD COLUMN IF NOT EXISTS cancel_reason TEXT',
+    'ALTER TABLE kpi_logs ADD COLUMN IF NOT EXISTS forklift_id TEXT',
+    'ALTER TABLE kpi_logs ADD COLUMN IF NOT EXISTS reason TEXT',
+    'ALTER TABLE kpi_logs ADD COLUMN IF NOT EXISTS forklift_status_at_time TEXT',
+  ];
+  for (const q of alterQueries) {
+    await pool.query(q).catch(() => {});
+  }
+
   const typesCount = await pool.query('SELECT COUNT(*) as count FROM forklift_types');
   if (parseInt(typesCount.rows[0].count) === 0) {
     for (const name of ['3T', '3.5T', '7T Prod', '7T Galv']) {
@@ -87,18 +101,13 @@ async function initDb() {
     }
   }
 
-  // Seed leave comments
   const commentsCount = await pool.query('SELECT COUNT(*) as count FROM leave_comments');
   if (parseInt(commentsCount.rows[0].count) === 0) {
-    for (const comment of [
-      'Prayer break', 'Lunch break', 'Technical issue with forklift',
-      'On another task', 'End of shift',
-    ]) {
+    for (const comment of ['Prayer break', 'Lunch break', 'Technical issue with forklift', 'On another task', 'End of shift']) {
       await pool.query('INSERT INTO leave_comments (comment) VALUES ($1) ON CONFLICT DO NOTHING', [comment]);
     }
   }
 
-  // Seed config
   const configCount = await pool.query('SELECT COUNT(*) as count FROM config');
   if (parseInt(configCount.rows[0].count) === 0) {
     await pool.query("INSERT INTO config (key, value) VALUES ('task_timeout_seconds', '300') ON CONFLICT DO NOTHING");

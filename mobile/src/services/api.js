@@ -4,12 +4,8 @@ const BASE_URL = CONFIG.SERVER_URL;
 
 async function request(method, endpoint, body = null) {
   const url = `${BASE_URL}${endpoint}`;
-  const options = {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-  };
+  const options = { method, headers: { 'Content-Type': 'application/json' } };
   if (body) options.body = JSON.stringify(body);
-
   try {
     const response = await fetch(url, options);
     const data = await response.json();
@@ -21,16 +17,13 @@ async function request(method, endpoint, body = null) {
 
 // Auth
 export const verifyPin = (pin) => request('POST', '/api/auth/verify-pin', { pin });
-export const changePin = (current_pin, new_pin) =>
-  request('POST', '/api/auth/change-pin', { current_pin, new_pin });
+export const changePin = (current_pin, new_pin) => request('POST', '/api/auth/change-pin', { current_pin, new_pin });
 
 // Forklifts
 export const getForklifts = () => request('GET', '/api/forklifts');
 export const getForkliftTypes = () => request('GET', '/api/forklifts/types');
 export const createForklift = (data) => request('POST', '/api/forklifts', data);
 export const deleteForklift = (id) => request('DELETE', `/api/forklifts/${id}`);
-
-// Forklift types (dynamic - fix #3)
 export const createForkliftType = (name) => request('POST', '/api/forklifts/types', { name });
 export const deleteForkliftType = (id) => request('DELETE', `/api/forklifts/types/${id}`);
 
@@ -46,6 +39,10 @@ export const getRequests = (params = {}) => {
   return request('GET', `/api/requests${query ? '?' + query : ''}`);
 };
 export const getKpiSummary = () => request('GET', '/api/requests/kpi/summary');
+export const getRequestHistory = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return request('GET', `/api/requests/history${query ? '?' + query : ''}`);
+};
 
 // Config
 export const getConfig = () => request('GET', '/api/config');
